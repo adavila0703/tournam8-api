@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request, Response
-from dotenv import dotenv_values
+from src.env import ENV
 from pymongo import MongoClient
 
-ENV = dotenv_values('.env')
+
 app = FastAPI()
 
 cluster = MongoClient(ENV['MONGO_CONNECTION_STRING'])
