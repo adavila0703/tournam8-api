@@ -82,17 +82,18 @@ async def player_removed_from_signups(res: Response, req: Request) -> None:
 async def start_tournament(res: Response, req: Request) -> None:
     tournament_data = await req.json()
     id = tournament_data['id']
-    collection.update_one({
+
+    # TODO Move these 2 update_one's to update_many()
+    collection.update_many({
          '_id': id
         }, 
         {
             '$set': {
+                f"{id}.status": True ,
                 f"{id}.players_attended": tournament_data['tournament']['players_signed_up']
             }
         }
     )
-    print('start_tournament -> ', tournaments)
-
 
 # TODO: Could maybe be optimized to just add to player's stats
 @app.post('/record_player_stats')
