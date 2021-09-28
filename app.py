@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Request, Response
-from src.env import ENV
+from src.vars.vars import Env
 from pymongo import MongoClient
 
 
 app = FastAPI()
 
-cluster = MongoClient(ENV['MONGO_CONNECTION_STRING'])
-collection = cluster[ENV['DB_NAME']][ENV['DB_NAME']]
+cluster = MongoClient(Env.MONGO_CONNECTION_STRING.value)
+collection = cluster[Env.DB_NAME.value][Env.DB_NAME.value]
 
 tournaments = {}
 
@@ -15,7 +15,7 @@ async def home(res: Response, req: Request):
     print(f'Home Received Request')
     return "Welcome to the Tournam8 API!!!"
 
-@app.get('/get_all_tournaments')
+@app.get('/get_all_tournaments/{guild_id}')
 async def get_all_tournaments(res: Response, req: Request) -> None:
     database = collection.find({}, {'_id': False})
     tournaments.clear()
@@ -29,7 +29,11 @@ async def get_all_tournaments(res: Response, req: Request) -> None:
 @app.post('/create_tournament')
 async def create_tournament(res: Response, req: Request) -> None:
     tournament = await req.json()
-    collection.insert_one({ '_id': tournament['id'], tournament['id']: tournament })
+    collection.insert_one({ 
+        '_id': tournament['guild_id'], 
+        tournament['data']['id']: tournament['data']
+        }
+    )
     print('API -> ', tournaments)
     return None
 
